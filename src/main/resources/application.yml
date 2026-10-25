@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: Movie_API_Service
+
+
+
+---
+spring:
+  profiles:
+    active:
+    - dev
+---
+
+spring:
+  datasource:
+    username: root
+    password: Gaurav@123
+    url: jdbc:mysql://localhost:3306/movieflix_dev
+
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+  config:
+    activate:
+      on-profile:
+      - dev
