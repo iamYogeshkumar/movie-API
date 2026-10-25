@@ -27,3 +27,6 @@ spring:
     activate:
       on-profile:
       - dev
+
+project:
+  poster:posters/

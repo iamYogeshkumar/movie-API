@@ -43,7 +43,6 @@ public class Movie {
 	private Set<String> movieCast; //list of actor & actress
 	
 	@Column(nullable = false,length = 200)
-	@NotBlank(message = "please provide movie's release year")
 	private Integer releaseYear;
 	
 	@Column(nullable = false,length = 200)
