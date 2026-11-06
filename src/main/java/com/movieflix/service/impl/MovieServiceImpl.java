@@ -3,20 +3,20 @@ package com.movieflix.service.impl;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.management.RuntimeErrorException;
-
-import org.jspecify.annotations.Nullable;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.movieflix.dto.MovieDto;
+import com.movieflix.dto.MoviePageResponse;
 import com.movieflix.entity.Movie;
 import com.movieflix.repo.MovieRepository;
 import com.movieflix.service.FileService;
@@ -141,6 +141,53 @@ public class MovieServiceImpl implements MovieService {
 		movieRepository.deleteById(movieId);
 		return "movie deleted with id= "+movieId;
 	}
+
+	@Override
+	public MoviePageResponse getAllMoviesWithPagination(Integer pageNumber, Integer pageSize) {
+		PageRequest of = PageRequest.of(pageNumber, pageSize);
+		Page<Movie> moviePages = movieRepository.findAll(of);
+		List<Movie> movies = moviePages.getContent();
+		List<MovieDto> movieDtos=new ArrayList<>();
+		
+		for(Movie movie:movies) {
+			String posterUrl=baseUrl + "/file/" + movie.getPoster();
+			MovieDto dto=new MovieDto();
+			
+			BeanUtils.copyProperties(movie, dto);
+			
+			dto.setPosterUrl(posterUrl);
+			movieDtos.add(dto);
+		}
+		
+		
+		
+		
+		return new MoviePageResponse(movieDtos, pageNumber, pageSize, moviePages.getTotalElements(), moviePages.getTotalPages(), moviePages.isLast());
+	}
+
+	@Override
+	public MoviePageResponse getAllMoviesWithPaginationAndSorting(Integer pageNumber, Integer pageSize, String sortBy,
+			String dir) {
+		Sort sort=dir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending(): Sort.by(sortBy).descending();
+		PageRequest of = PageRequest.of(pageNumber, pageSize,sort);
+		Page<Movie> moviePages = movieRepository.findAll(of);
+		List<Movie> movies = moviePages.getContent();
+		List<MovieDto> movieDtos=new ArrayList<>();
+		
+		for(Movie movie:movies) {
+			String posterUrl=baseUrl + "/file/" + movie.getPoster();
+			MovieDto dto=new MovieDto();
+			BeanUtils.copyProperties(movie, dto);
+			dto.setPosterUrl(posterUrl);
+			movieDtos.add(dto);
+		}
+		
+		return new MoviePageResponse(movieDtos, pageNumber, pageSize, moviePages.getTotalElements(), moviePages.getTotalPages(), moviePages.isLast());
+	}
+
+	
+
+	
 	
 
 }
